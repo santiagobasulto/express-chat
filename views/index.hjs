@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat Room</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>Messages:</h1>
+    <div id="messageList">
+    </div>
+    <br><hr>
+    <p class="connectionDebugger"style='color: red'>Establishing connection</p>
+
+    <form id="formMessage" action="">
+        <label for="message">Your message: </label>
+        <input type="text" id="message" name="message" autocomplete="off" disabled='disabled'>
+        <input type="submit" value="Send" disabled='disabled'>
+    </form>
+
+    <br><hr>
+    <form id="formName" action="">
+      <label for="name">Set your name: </label>
+      <input type="text" id="name" name="name" disabled='disabled'>
+      <input type="submit" value="Set Name" disabled='disabled'>
+    </form>
+
+    <br><br>
+    <hr><br>
+    <h3>Debug Info</h3>
+    <div id="debug">
+      <p>Client ID: <span class="clientId"></span></p>
+      <p>Client Name: <span class="name"></span></p>
+    </div>
+
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="/js/socket.io.js"></script>
+
+    <script>
+        var client = {};
+        var socket = io();
+        var form = $("#formMessage");
+        var messageInput = $('#message');
+
+        var enableForm = function(){
+          [form, $("#formName")].forEach(function(form){
+            //form.find('#message').removeAttr('disabled');
+            form.find('input').removeAttr('disabled');
+          });
+          $("p.connectionDebugger").hide();
+        };
+
+        socket.on('setup', function(data){
+          console.log("Setup done");
+          client = data;
+          var debug = $("#debug")
+          debug.find('.clientId').html(client.id)
+          debug.find('.name').html(client.name)
+          enableForm()
+        });
+
+        socket.on('new message', function(data){
+          var message = $("<p></p>");
+          message.html("<b>"+ data.name +"</b> " + data.message);
+
+          $("#messageList").append(message)
+        });
+
+        form.submit(function(evt){
+            evt.preventDefault();
+
+            socket.emit('chat message', {
+                //console.log("Sending chat message from client " + client.id);
+                clientId: client.id,
+                message: messageInput.val()
+            });
+
+            messageInput.val('');
+        });
+
+        $("#formName").submit(function(evt){
+          evt.preventDefault();
+          var name = $("#formName").find('[name="name"]').val();
+          $("#formName").find('[name="name"]').val("");
+          console.log("Setting name: " + name);
+          $("#debug").find('.name').html(name);
+          socket.emit('set name', {clientId: client.id, name: name})
+        });
+    </script>
+  </body>
+</html>
