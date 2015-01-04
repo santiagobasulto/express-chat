@@ -34,7 +34,7 @@ function getLogger(){
                     json: false,
                     timestamp: true,
                     prettyPrint: true,
-                    depth: 2,
+                    depth: 1,
                     colorize: true
                 })
             ],

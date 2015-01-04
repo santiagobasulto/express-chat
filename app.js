@@ -6,6 +6,7 @@ var path = require('path');
 
 var routes = require('./routes')
 var realtime = require('./realtime')
+var logger = require('./logger')
 
 // Changed hogan.js delimiters so it won't conflict with Angular
 app.locals.delimiters = '<% %>';

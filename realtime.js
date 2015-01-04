@@ -1,3 +1,5 @@
+var logger = require('./logger')
+
 var ID = 1
 var connectedClients = {}
 
@@ -21,7 +23,7 @@ var sockets = [];
 
 exports.setup = function(io){
   var onConnection = function (socket) {
-    console.log("Connection established");
+    logger.info("Connection established with socket", { socket: socket.id })
     sockets.push(socket);
 
     var client = {
@@ -31,10 +33,10 @@ exports.setup = function(io){
     connectedClients[client.id] = client;
 
     socket.emit('setup', client);
+    socket.broadcast.emit('user connected', client)
+
     var onChatMessage = function (data) {
-      console.log("Got chat message with data: " + require('util').inspect(data))
       var client = getClientById(data.clientId);
-      console.log("Client " + data.clientId + "("+ client.id + ") sent a message: " + data.message)
       var message = {
         name: client.name,
         message: data.message
@@ -43,12 +45,14 @@ exports.setup = function(io){
     };
     var onSetName = function(data, callback){
       var name = data.name;
-      console.log("Setting name of client " + data.clientId + " to: " + name);
-
       var client = getClientById(data.clientId);
       client.name = name;
       callback(data);
     }
+    socket.on('disconnect', function(){
+      logger.debug("Socket disconnected", {client: client})
+      io.sockets.emit('user disconnected', client);
+    })
 
     socket.on('chat message', onChatMessage);
     socket.on('set name', onSetName);
