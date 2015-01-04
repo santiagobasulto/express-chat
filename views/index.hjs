@@ -16,7 +16,7 @@
   </head>
   <body ng-controller="MainCtrl">
 
-    <div class="container-fluid">
+    <div class="container">
       <div class="row" ng-cloak>
         <h3>Debug Info:</h3>
         <p><code>Client ID: <span>{{client.id || "Undefined"}}</span></code></p>
@@ -25,26 +25,26 @@
 
       <div class="row">
         <!-- Left col -->
-        <div class="col-lg-4" style="background: #9A9AE5;border:1px red solid;">
-        <div class="row"><div class="col-lg-12"><h3>Users</h3></div></div>
-          <div class="row"><div class="col-lg-12" style="height: 340px;background: #fff;"></div></div>
-          <div class="row" style="padding-top: 20px; padding-bottom: 20px">
+        <div class="col-lg-4 users-column">
+          <div class="row"><div class="col-lg-12 column-title"><h3>Users</h3></div></div>
+          <div class="row"><div class="col-lg-12 users-list-container"></div></div>
+          <div class="row set-name-form-container">
             <form ng-submit='changeName()'>
               <div class="col-lg-8">
-                <input type="text" name="name" ng-model="name" style="width: 100%" ng-disabled="!client.id">
+                <input type="text" name="name" ng-model="name" ng-disabled="!client.id">
               </div>
               <div class="col-lg-4">
-                <input type="submit" value="Set name" style="width: 100%;">
+                <input type="submit" value="Set name" ng-disabled="!client.id">
               </div>
             </form>
           </div>
         </div>
 
         <!-- Right col -->
-        <div class="col-lg-8" style="background: #F49999;border:1px red solid;">
-          <div class="row"><div class="col-lg-12"><h3>Messages</h3></div></div>
+        <div class="col-lg-8 messages-column">
+          <div class="row"><div class="col-lg-12 column-title"><h3>Messages</h3></div></div>
           <div class="row">
-            <div class="col-lg-12" style="height: 340px;background: #fff;">
+            <div class="col-lg-12 messages-list-container">
               <ul>
                 <li ng-repeat="message in messages" ng-cloak>
                   <b>{{message.author}}</b>: {{message.txt}}
@@ -52,16 +52,16 @@
               </ul>
             </div>
           </div>
-          <div class="row" style="padding-top: 20px; padding-bottom: 20px">
+          <div class="row send-message-form-container">
             <form ng-submit='sendMessage()'>
               <div class="col-lg-1">
                 Message:
               </div>
               <div class="col-lg-7">
-                <input type="text" name="message" ng-model="message" style="width: 100%" ng-disabled="!client.id">
+                <input type="text" name="message" ng-model="message" ng-disabled="!client.id">
               </div>
               <div class="col-lg-2">
-                <input type="submit" value="Set name" style="width: 100%;">
+                <input type="submit" value="Set name" ng-disabled="!client.id">
               </div>
             </form>
           </div>
