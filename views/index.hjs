@@ -1,90 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="chatApp">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Chat Room</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <link rel='stylesheet' href="/bower_components/bootstrap/dist/css/bootstrap.css">
+
+    <!-- Custom styles-->
+    <link rel='stylesheet' href='/css/main.css' />
+    <style>
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+      display: none !important;
+    }
+    </style>
   </head>
-  <body>
-    <h1>Messages:</h1>
-    <div id="messageList">
+  <body ng-controller="MainCtrl">
+
+    <div class="container-fluid">
+      <div class="row" ng-cloak>
+        <h3>Debug Info:</h3>
+        <p><code>Client ID: <span>{{client.id || "Undefined"}}</span></code></p>
+        <p><code>Client Name: <span>{{client.name || "Undefined" }}</span></code></p>
+      </div>
+
+      <div class="row">
+        <!-- Left col -->
+        <div class="col-lg-4" style="background: #9A9AE5;border:1px red solid;">
+        <div class="row"><div class="col-lg-12"><h3>Users</h3></div></div>
+          <div class="row"><div class="col-lg-12" style="height: 340px;background: #fff;"></div></div>
+          <div class="row" style="padding-top: 20px; padding-bottom: 20px">
+            <form ng-submit='changeName()'>
+              <div class="col-lg-8">
+                <input type="text" name="name" ng-model="name" style="width: 100%" ng-disabled="!client.id">
+              </div>
+              <div class="col-lg-4">
+                <input type="submit" value="Set name" style="width: 100%;">
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right col -->
+        <div class="col-lg-8" style="background: #F49999;border:1px red solid;">
+          <div class="row"><div class="col-lg-12"><h3>Messages</h3></div></div>
+          <div class="row">
+            <div class="col-lg-12" style="height: 340px;background: #fff;">
+              <ul>
+                <li ng-repeat="message in messages" ng-cloak>
+                  <b>{{message.author}}</b>: {{message.txt}}
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="row" style="padding-top: 20px; padding-bottom: 20px">
+            <form ng-submit='sendMessage()'>
+              <div class="col-lg-1">
+                Message:
+              </div>
+              <div class="col-lg-7">
+                <input type="text" name="message" ng-model="message" style="width: 100%" ng-disabled="!client.id">
+              </div>
+              <div class="col-lg-2">
+                <input type="submit" value="Set name" style="width: 100%;">
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
     </div>
-    <br><hr>
-    <p class="connectionDebugger"style='color: red'>Establishing connection</p>
 
-    <form id="formMessage" action="">
-        <label for="message">Your message: </label>
-        <input type="text" id="message" name="message" autocomplete="off" disabled='disabled'>
-        <input type="submit" value="Send" disabled='disabled'>
-    </form>
-
-    <br><hr>
-    <form id="formName" action="">
-      <label for="name">Set your name: </label>
-      <input type="text" id="name" name="name" disabled='disabled'>
-      <input type="submit" value="Set Name" disabled='disabled'>
-    </form>
-
-    <br><br>
-    <hr><br>
-    <h3>Debug Info</h3>
-    <div id="debug">
-      <p>Client ID: <span class="clientId"></span></p>
-      <p>Client Name: <span class="name"></span></p>
-    </div>
-
-    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="/js/socket.io.js"></script>
 
-    <script>
-        var client = {};
-        var socket = io();
-        var form = $("#formMessage");
-        var messageInput = $('#message');
+    <script src="/bower_components/angular/angular.js"></script>
+    <script src="/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="/bower_components/angular-touch/angular-touch.js"></script>
+    <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="/bower_components/angular-resource/angular-resource.js"></script>
+    <script src="/bower_components/angular-route/angular-route.js"></script>
+    <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
-        var enableForm = function(){
-          [form, $("#formName")].forEach(function(form){
-            //form.find('#message').removeAttr('disabled');
-            form.find('input').removeAttr('disabled');
-          });
-          $("p.connectionDebugger").hide();
-        };
-
-        socket.on('setup', function(data){
-          console.log("Setup done");
-          client = data;
-          var debug = $("#debug")
-          debug.find('.clientId').html(client.id)
-          debug.find('.name').html(client.name)
-          enableForm()
-        });
-
-        socket.on('new message', function(data){
-          var message = $("<p></p>");
-          message.html("<b>"+ data.name +"</b> " + data.message);
-
-          $("#messageList").append(message)
-        });
-
-        form.submit(function(evt){
-            evt.preventDefault();
-
-            socket.emit('chat message', {
-                //console.log("Sending chat message from client " + client.id);
-                clientId: client.id,
-                message: messageInput.val()
-            });
-
-            messageInput.val('');
-        });
-
-        $("#formName").submit(function(evt){
-          evt.preventDefault();
-          var name = $("#formName").find('[name="name"]').val();
-          $("#formName").find('[name="name"]').val("");
-          console.log("Setting name: " + name);
-          $("#debug").find('.name').html(name);
-          socket.emit('set name', {clientId: client.id, name: name})
-        });
-    </script>
+    <script src="/js/index.js"></script>
   </body>
 </html>
