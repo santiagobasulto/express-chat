@@ -5,14 +5,14 @@
     <title>Chat Room</title>
 
     <link rel='stylesheet' href="/bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel='stylesheet' href="/bower_components/animate.css/animate.min.css">
 
     <!-- Custom styles-->
     <link rel='stylesheet' href='/css/main.css' />
     <style>
-    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
-      display: none !important;
-    }
-
+      [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+        display: none !important;
+      }
     </style>
   </head>
   <body ng-controller="MainCtrl">
@@ -24,7 +24,7 @@
         <p><code>Client Name: <span>{{client.name || "Undefined" }}</span></code></p>
       </div>
       <div class="row alerts" ng-cloak>
-        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" ng-show="alert.show">
           <span ng-bind-html="alert.msg"></span>
         </alert>
       </div>

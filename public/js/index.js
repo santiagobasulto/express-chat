@@ -19,26 +19,11 @@ angular.module(APP_NAME).controller("MainCtrl", ['$scope', '$timeout','EVENT_NAM
   $scope.messages = [];
   $scope.usersConnected = [];
 
-  var LAST_ALERT_ID = 1;
-  var removeAlertById = function(_id){
-    var position = null;
-
-    for(var i=0; i<$scope.alerts.length; i++){
-      var alert = $scope.alerts[i];
-      if(alert.id == _id){
-        position = i;
-        break;
-      }
-    }
-    if(position !== null){
-      $scope.alerts.splice(position, 1);
-    }
-  };
   var addAlert = function(type, msg) {
-    var _id = LAST_ALERT_ID++;
-    $scope.alerts.push({id: _id, type: type, msg: msg});
+    var alert = {type: type, msg: msg, show: true};
+    $scope.alerts.push(alert);
     $timeout(function(){
-      removeAlertById(_id);
+      alert.show = false;
     }, 3000)
   };
 
