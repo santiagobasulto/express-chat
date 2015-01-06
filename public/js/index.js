@@ -6,6 +6,7 @@ angular.module(APP_NAME, [
 
 angular.module(APP_NAME).value('EVENT_NAMES', {
   SETUP: 'setup',
+  SOCKET_DISCONNECTED: 'disconnect',
   NEW_MESSAGE: 'new message',
   CHAT_MESSAGE: 'chat message',
   SET_NAME: 'set name',
@@ -13,25 +14,39 @@ angular.module(APP_NAME).value('EVENT_NAMES', {
   USER_DISCONNECTED: 'user disconnected'
 });
 
+
 angular.module(APP_NAME).controller("MainCtrl", ['$scope', '$timeout','EVENT_NAMES','socket', function($scope, $timeout, evt, socket) {
-  $scope.client = {}
+  $scope.client = {};
   $scope.alerts = [];
   $scope.messages = [];
   $scope.usersConnected = [];
+
+  $scope.socketConnected = false;
+  $scope.tryingToReconnect = false;
+
+  $scope.tryToReconnect = function(){
+    $scope.tryingToReconnect = true;
+    socket.connect(function(err){
+      $scope.tryingToReconnect = false;
+      if(!err){
+        $scope.socketConnected = true;
+      }
+    });
+  };
 
   var addAlert = function(type, msg) {
     var alert = {type: type, msg: msg, show: true};
     $scope.alerts.push(alert);
     $timeout(function(){
       alert.show = false;
-    }, 3000)
+    }, 3000);
   };
 
-  var curriedAlert = _.curry(addAlert)
-  var addWarningAlert = curriedAlert('warning')
-  var addInfoAlert = curriedAlert('info')
-  var addSuccessAlert = curriedAlert('success')
-  var addDangerAlert = curriedAlert('danger')
+  var curriedAlert = _.curry(addAlert);
+  var addWarningAlert = curriedAlert('warning');
+  var addInfoAlert = curriedAlert('info');
+  var addSuccessAlert = curriedAlert('success');
+  var addDangerAlert = curriedAlert('danger');
 
   $scope.closeAlert = function(index) {
     $scope.alerts.splice(index, 1);
@@ -46,7 +61,7 @@ angular.module(APP_NAME).controller("MainCtrl", ['$scope', '$timeout','EVENT_NAM
     }, function(data){
       $scope.client.name = data.name;
     });
-  }
+  };
 
   $scope.sendMessage = function(){
     var msg = $scope.message;
@@ -55,26 +70,31 @@ angular.module(APP_NAME).controller("MainCtrl", ['$scope', '$timeout','EVENT_NAM
       message: msg
     });
     $scope.message = "";
-  }
+  };
+  socket.on(evt.SOCKET_DISCONNECTED, function(){
+    $scope.socketConnected = false;
+  });
 
   socket.on(evt.SETUP, function(data){
+    $scope.socketConnected = true;
     $scope.client.id = data.id;
     $scope.client.name = data.name;
   });
 
   socket.on(evt.NEW_MESSAGE, function(data){
-    $scope.messages.push({author: data.name, txt: data.message})
+    $scope.messages.push({author: data.name, txt: data.message});
   });
 
   socket.on(evt.USER_CONNECTED, function(user){
     $scope.usersConnected.push(user);
-    addInfoAlert("User connected! Say hello to: <b>" + user.name +"</b>.")
-  })
+    // Not XSS safe
+    addInfoAlert("User connected! Say hello to: <b>" + user.name +"</b>.");
+  });
   socket.on(evt.USER_DISCONNECTED, function(user){
     var position = null;
 
     for(var i=0; i<$scope.usersConnected.length; i++){
-      var _user = $scope.usersConnected[i]
+      var _user = $scope.usersConnected[i];
       if(user.id == _user.id){
         position = i;
         break;
@@ -83,32 +103,37 @@ angular.module(APP_NAME).controller("MainCtrl", ['$scope', '$timeout','EVENT_NAM
     if(position !== null){
       $scope.usersConnected.splice(position, 1);
     }
-    addInfoAlert("User <b>" + user.name +"</b> disconnected.")
-  })
-
-
+    // Not XSS safe
+    addInfoAlert("User <b>" + user.name +"</b> disconnected.");
+  });
 }]);
 
-angular.module(APP_NAME).factory('socket', function ($rootScope) {
-  var socket = io();
+angular.module(APP_NAME).factory('socket', function($rootScope) {
+  var socket = io({
+    reconnection: false
+  });
   return {
-    on: function (eventName, callback) {
-      socket.on(eventName, function () {
+    on: function(eventName, callback) {
+      socket.on(eventName, function() {
         var args = arguments;
-        $rootScope.$apply(function () {
+        $rootScope.$apply(function() {
           callback.apply(socket, args);
         });
       });
     },
-    emit: function (eventName, data, callback) {
-      socket.emit(eventName, data, function () {
+    emit: function(eventName, data, callback) {
+      socket.emit(eventName, data, function() {
         var args = arguments;
-        $rootScope.$apply(function () {
+        $rootScope.$apply(function() {
           if (callback) {
             callback.apply(socket, args);
           }
         });
-      })
-    }
+      });
+    },
+    connect: function(callback){
+      socket.io.connect(callback);
+    },
+    _socket: socket
   };
 });

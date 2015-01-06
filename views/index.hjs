@@ -18,6 +18,12 @@
   <body ng-controller="MainCtrl">
 
     <div class="container">
+      <div class="row" ng-cloak ng-show="!socketConnected" style="padding-top: 20px;">
+        <alert type="danger">
+          We lost connection with our server!
+          <button ng-click="tryToReconnect()" ng-disabled="tryingToReconnect">Try to connect</button>
+        </alert>
+      </div>
       <div class="row" ng-cloak>
         <h3>Debug Info:</h3>
         <p><code>Client ID: <span>{{client.id || "Undefined"}}</span></code></p>
@@ -45,10 +51,10 @@
           <div class="row set-name-form-container">
             <form ng-submit='changeName()'>
               <div class="col-lg-8">
-                <input type="text" name="name" ng-model="name" ng-disabled="!client.id">
+                <input type="text" name="name" ng-model="name" ng-disabled="!socketConnected">
               </div>
               <div class="col-lg-4">
-                <input type="submit" value="Set name" ng-disabled="!client.id">
+                <input type="submit" value="Set name" ng-disabled="!socketConnected">
               </div>
             </form>
           </div>
@@ -72,15 +78,14 @@
                 Message:
               </div>
               <div class="col-lg-7">
-                <input type="text" name="message" ng-model="message" ng-disabled="!client.id">
+                <input type="text" name="message" ng-model="message" ng-disabled="!socketConnected">
               </div>
               <div class="col-lg-2">
-                <input type="submit" value="Set name" ng-disabled="!client.id">
+                <input type="submit" value="Set name" ng-disabled="!socketConnected">
               </div>
             </form>
           </div>
         </div>
-
       </div>
     </div>
 
