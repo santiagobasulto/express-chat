@@ -15,7 +15,7 @@ angular.module(APP_NAME).value('EVENT_NAMES', {
 });
 
 
-angular.module(APP_NAME).controller("MainCtrl", ['$scope', '$timeout','EVENT_NAMES','socket', function($scope, $timeout, evt, socket) {
+angular.module(APP_NAME).controller("MainCtrl", ['$scope', '$timeout','EVENT_NAMES','socket', 'alertsFactory', function($scope, $timeout, evt, socket, alertsFactory) {
   $scope.client = {};
   $scope.alerts = [];
   $scope.messages = [];
@@ -33,20 +33,6 @@ angular.module(APP_NAME).controller("MainCtrl", ['$scope', '$timeout','EVENT_NAM
       }
     });
   };
-
-  var addAlert = function(type, msg) {
-    var alert = {type: type, msg: msg, show: true};
-    $scope.alerts.push(alert);
-    $timeout(function(){
-      alert.show = false;
-    }, 3000);
-  };
-
-  var curriedAlert = _.curry(addAlert);
-  var addWarningAlert = curriedAlert('warning');
-  var addInfoAlert = curriedAlert('info');
-  var addSuccessAlert = curriedAlert('success');
-  var addDangerAlert = curriedAlert('danger');
 
   $scope.closeAlert = function(index) {
     $scope.alerts.splice(index, 1);
@@ -88,7 +74,10 @@ angular.module(APP_NAME).controller("MainCtrl", ['$scope', '$timeout','EVENT_NAM
   socket.on(evt.USER_CONNECTED, function(user){
     $scope.usersConnected.push(user);
     // Not XSS safe
-    addInfoAlert("User connected! Say hello to: <b>" + user.name +"</b>.");
+    var alert = alertsFactory.info("User connected! Say hello to: <b>" + user.name +"</b>.");
+    console.log("USER_CONNECTED")
+    console.log(alert)
+    $scope.alerts.push(alert);
   });
   socket.on(evt.USER_DISCONNECTED, function(user){
     var position = null;
@@ -104,7 +93,8 @@ angular.module(APP_NAME).controller("MainCtrl", ['$scope', '$timeout','EVENT_NAM
       $scope.usersConnected.splice(position, 1);
     }
     // Not XSS safe
-    addInfoAlert("User <b>" + user.name +"</b> disconnected.");
+    var alert = alertsFactory.info("User <b>" + user.name +"</b> disconnected.");
+    $scope.alerts.push(alert);
   });
 }]);
 
@@ -137,3 +127,27 @@ angular.module(APP_NAME).factory('socket', function($rootScope) {
     _socket: socket
   };
 });
+
+angular.module(APP_NAME).factory('alertsFactory', ['$rootScope', '$timeout', function($rootScope, $timeout){
+  var addAlert = function(type, msg) {
+    var alert = {type: type, msg: msg, show: true};
+    $timeout(function(){
+      alert.show = false;
+    }, 3000);
+    return alert;
+  };
+
+  var curriedAlert = _.curry(addAlert);
+  var addWarningAlert = curriedAlert('warning');
+  var addInfoAlert = curriedAlert('info');
+  var addSuccessAlert = curriedAlert('success');
+  var addDangerAlert = curriedAlert('danger');
+
+  return {
+    addAlert: addAlert,
+    warning: addWarningAlert,
+    info: addInfoAlert,
+    success: addSuccessAlert,
+    danger: addDangerAlert
+  };
+}]);
