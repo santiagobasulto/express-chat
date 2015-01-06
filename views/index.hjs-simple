@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html ng-app="chatApp">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chat Room</title>
+
+    <link rel='stylesheet' href="/bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel='stylesheet' href="/bower_components/animate.css/animate.min.css">
+
+    <!-- Custom styles-->
+    <link rel='stylesheet' href='/css/main.css' />
+    <style>
+      [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body ng-controller="MainCtrl">
+    <h1 ng-cloak>Hello {{name}}</h1>
+    <script src="/dist/app.js"></script>
+  </body>
+</html>

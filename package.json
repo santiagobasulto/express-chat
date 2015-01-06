@@ -19,12 +19,37 @@
   },
   "devDependencies": {
     "browser-sync": "^1.8.3",
+    "browserify": "^8.0.3",
+    "browserify-shim": "^3.8.2",
     "gulp": "^3.8.10",
+    "gulp-browserify": "^0.5.0",
     "gulp-jshint": "^1.9.0",
     "gulp-less": "^2.0.1",
     "gulp-nodemon": "^1.0.4",
+    "gulp-rename": "^1.2.0",
     "gulp-sourcemaps": "^1.3.0",
     "jshint-stylish": "^1.0.0",
+    "lodash": "^2.4.1",
     "nodemon": "^1.2.1"
+  },
+  "browser": {
+    "angular": "./public/bower_components/angular/angular.js",
+    "angular-animate": "./public/bower_components/angular-animate/angular-animate.js",
+    "angular-cookies": "./public/bower_components/angular-cookies/angular-cookies.js",
+    "angular-touch": "./public/bower_components/angular-touch/angular-touch.js",
+    "angular-sanitize": "./public/bower_components/angular-sanitize/angular-sanitize.js",
+    "angular-resource": "./public/bower_components/angular-resource/angular-resource.js",
+    "angular-route": "./public/bower_components/angular-route/angular-route.js",
+    "ui-bootstrap": "./public/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"
+  },
+  "browserify-shim": {
+    "./public/bower_components/angular/angular.js": {
+      "exports": "angular"
+    }
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
   }
 }
