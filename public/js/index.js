@@ -128,7 +128,11 @@ angular.module(APP_NAME).factory('socket', function($rootScope) {
   };
 });
 
-angular.module(APP_NAME).factory('alertsFactory', ['$rootScope', '$timeout', function($rootScope, $timeout){
+angular.module(APP_NAME).factory('lodashFactory', function(){
+  return _;
+});
+
+angular.module(APP_NAME).factory('alertsFactory', ['$rootScope', '$timeout', 'lodashFactory',function($rootScope, $timeout, _){
   var addAlert = function(type, msg) {
     var alert = {type: type, msg: msg, show: true};
     $timeout(function(){
